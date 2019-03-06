@@ -81,8 +81,8 @@ module male_connector(
         
     if(pin_inward) {
         difference() {
-            render_shell(item_height, mid_in_radius, inner_radius);
-            render_locks(number_of_locks, mid_in_radius, item_height, shaft_radius, pin_depth, clearance, twist_angle);
+           render_shell(item_height, mid_in_radius, inner_radius);
+           render_locks(number_of_locks, mid_in_radius, item_height, shaft_radius, pin_depth, clearance, twist_angle);
         }
     } else {
         render_shell(item_height, mid_in_radius, inner_radius);
@@ -124,8 +124,11 @@ module render_locks(
     twist_angle) {
 
     module render_lock(r,h, shaft_radius, pin_depth, clearance, a) {
+
         translate([0,0,h - pin_depth]) {
+/*
             difference() {
+
                 rotate_extrude2(angle = -a, convexity = 10, size=2 * r){
                     translate([r+clearance, 0, 0]){
                         circle(r = shaft_radius);
@@ -139,6 +142,8 @@ module render_locks(
                     }
                 }
             }
+*/
+
             translate([r+clearance, 0, 0]){
                 cylinder(r = shaft_radius, h=h);
                 sphere(shaft_radius);
@@ -155,7 +160,27 @@ module render_locks(
     }
 
     delta_angle = 360 / number_of_locks;
-        
+    w = tan(delta_angle - twist_angle)*r;
+
+    difference() {
+        translate([0,0,h - pin_depth]) {
+            rotate_extrude(convexity = 10){
+                translate([r+clearance, 0, 0]){
+                    circle(r = shaft_radius);
+                }
+            }
+        }
+        for(i = [0:number_of_locks-1]) {
+            rotate([0,0,i * delta_angle]) {
+                translate([0,0,h - pin_depth + shaft_radius]) {
+                    rotate([twist_angle,90,0]) {
+                        prism(2*shaft_radius+clearance,r + shaft_radius, w);
+                    }
+                }
+            }
+        }
+    }
+
     for(i = [0:number_of_locks-1]) {
         rotate([0,0,i * delta_angle]) {
             render_lock(r, h, shaft_radius, pin_depth, clearance, twist_angle);
@@ -163,6 +188,12 @@ module render_locks(
     }
 }
     
+module prism(l, w, h){
+    polyhedron(
+        points=[[0,0,0], [l,0,0], [l,w,0], [0,w,0], [0,w,h], [l,w,h]],
+        faces=[[0,1,2,3],[5,4,3,2],[0,4,5,1],[0,3,4],[5,2,1]]
+    );
+}
 
 module render_shell(
     lip_height,
