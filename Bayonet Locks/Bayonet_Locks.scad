@@ -1,4 +1,15 @@
-test();
+/************************************************************
+ * This library created collaboratively by Steve Morgan and *
+ * Alexandre da Silva Xavier under copyright                *
+ *                                                          *
+ * Based on original work by Alexandre da Silva Xavier      *
+ * (https://www.thingiverse.com/thing:3471896)              *
+ *                                                          *
+ * Licensed under Creative Commons - Attribution            *
+ *                                                          *
+ * Simple bayonet cylindrical locking mechanism             *
+ * Original: ver 1.3 - 05/03/2019 (d/m/y)                   *
+ ************************************************************/
 
 module test() {
     $fn=30;
