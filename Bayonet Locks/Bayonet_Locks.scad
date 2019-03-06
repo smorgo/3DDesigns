@@ -37,7 +37,8 @@ module female_connector(
     number_of_locks = 4,
     pin_inward = true,
     clearance = 0.4,
-    twist_angle = 30) {
+    twist_angle = 30,
+    notch_angle = 22) {
 
     item_height = connector_height + lip_height;
     mid_in_radius = (inner_radius + outer_radius)/2 - clearance/2;
@@ -48,7 +49,6 @@ module female_connector(
 
     render_shell(lip_height, outer_radius, inner_radius);
         
-        
     if(pin_inward) {
         render_shell(item_height, outer_radius, mid_out_radius);
         render_pins(number_of_locks, mid_out_radius, item_height, pin_radius, pin_depth, clearance);
@@ -57,6 +57,7 @@ module female_connector(
             render_shell(item_height, outer_radius, mid_out_radius);
             render_locks(number_of_locks, mid_out_radius, item_height, shaft_radius, pin_depth, clearance, twist_angle);
         }
+        render_lock_notches(number_of_locks, mid_out_radius, item_height, shaft_radius, pin_depth, clearance, notch_angle, -1);
     }
 }
 
@@ -68,7 +69,8 @@ module male_connector(
     number_of_locks = 4,
     pin_inward = true,
     clearance = 0.4,
-    twist_angle = 30) {
+    twist_angle = 30,
+    notch_angle = 22) {
 
     item_height = connector_height + lip_height;
     mid_in_radius = (inner_radius + outer_radius)/2 - clearance/2;
@@ -84,6 +86,7 @@ module male_connector(
            render_shell(item_height, mid_in_radius, inner_radius);
            render_locks(number_of_locks, mid_in_radius, item_height, shaft_radius, pin_depth, clearance, twist_angle);
         }
+        render_lock_notches(number_of_locks, mid_in_radius, item_height, shaft_radius, pin_depth, clearance, notch_angle);
     } else {
         render_shell(item_height, mid_in_radius, inner_radius);
         render_pins(number_of_locks, mid_in_radius, item_height, pin_radius, pin_depth, clearance);
@@ -113,7 +116,6 @@ module render_pins(
     }
 }
 
-
 module render_locks(
     number_of_locks,
     r,
@@ -124,27 +126,8 @@ module render_locks(
     twist_angle) {
 
     module render_lock(r,h, shaft_radius, pin_depth, clearance, a) {
-
         translate([0,0,h - pin_depth]) {
-/*
-            difference() {
-
-                rotate_extrude2(angle = -a, convexity = 10, size=2 * r){
-                    translate([r+clearance, 0, 0]){
-                        circle(r = shaft_radius);
-                    }
-                }
-                // This needs to be calculated properly!
-                echo("*** WARNING: Generating the locking notch in the wrong place!");
-                rotate([0,0,-a/2]) {
-                    translate([r - shaft_radius/1.25,0,-shaft_radius]) {
-                        cylinder(r=shaft_radius/5,h=shaft_radius*2);
-                    }
-                }
-            }
-*/
-
-            translate([r+clearance, 0, 0]){
+            translate([r, 0, 0]){
                 cylinder(r = shaft_radius, h=h);
                 sphere(shaft_radius);
                 rotate([0,0,-a/2]) {
@@ -152,7 +135,7 @@ module render_locks(
                 }
             }
             rotate([0,0,-a]) {
-                translate([r+clearance, 0, 0]){
+                translate([r, 0, 0]){
                     sphere(shaft_radius);
                 }
             }
@@ -165,7 +148,7 @@ module render_locks(
     difference() {
         translate([0,0,h - pin_depth]) {
             rotate_extrude(convexity = 10){
-                translate([r+clearance, 0, 0]){
+                translate([r, 0, 0]){
                     circle(r = shaft_radius);
                 }
             }
@@ -187,7 +170,34 @@ module render_locks(
         }
     }
 }
-    
+
+module render_lock_notches(
+    number_of_locks,
+    r,
+    h,
+    shaft_radius,
+    pin_depth,
+    clearance,
+    notch_angle,
+    direction = 1) {
+
+    module render_lock_notch(r,h, shaft_radius, pin_depth, clearance) {
+        translate([0,0,h - pin_depth - shaft_radius]) {
+            translate([r - shaft_radius * direction, 0, 0]){
+                cylinder(r = shaft_radius/8, h=shaft_radius * 2);
+            }
+        }
+    }
+
+    delta_angle = 360 / number_of_locks;
+
+    for(i = [0:number_of_locks-1]) {
+        rotate([0,0,i * delta_angle - notch_angle]) {
+            render_lock_notch(r, h, shaft_radius, pin_depth, clearance);
+        }
+    }
+}
+
 module prism(l, w, h){
     polyhedron(
         points=[[0,0,0], [l,0,0], [l,w,0], [0,w,0], [0,w,h], [l,w,h]],

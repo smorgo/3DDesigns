@@ -3,9 +3,9 @@ use <Bayonet_Locks.scad>;
 //test();
 $fn=48;
 
-male_connector(number_of_locks = 4, pin_inward=true);
+male_connector();
 
-translate([100,100,0])
+/*
 difference() {
     female_connector();
     for(i=[0:15]) {
@@ -16,3 +16,4 @@ difference() {
         }
     }
 }
+*/
