@@ -15,14 +15,16 @@ module test() {
     $fn=30;
     outer_radius = 18;
 
-    female_connector(pin_inward=true);
-    translate([outer_radius * 2, outer_radius * 2, 0]) {
+    translate([outer_radius * 3, outer_radius * -3, 0]) {
+        female_connector(pin_inward=true);
+    }
+    translate([outer_radius * 3, outer_radius * 3, 0]) {
         male_connector(pin_inward=true);
     }
-    translate([outer_radius * -2, outer_radius * 2, 0]) {
+    translate([outer_radius * -3, outer_radius * 3, 0]) {
         female_connector(pin_inward=false);
     }
-    translate([outer_radius * -2, outer_radius * -2, 0]) {
+    translate([outer_radius * -3, outer_radius * -3, 0]) {
         male_connector(pin_inward=false);
     }
 }
@@ -132,8 +134,8 @@ module render_locks(
                 // This needs to be calculated properly!
                 echo("*** WARNING: Generating the locking notch in the wrong place!");
                 rotate([0,0,-a/2]) {
-                    translate([r - shaft_radius/2,0,-shaft_radius/2]) {
-                        cylinder(r=shaft_radius/8,h=shaft_radius);
+                    translate([r - shaft_radius/1.25,0,-shaft_radius]) {
+                        cylinder(r=shaft_radius/5,h=shaft_radius*2);
                     }
                 }
             }
