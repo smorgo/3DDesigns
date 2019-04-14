@@ -11,9 +11,9 @@
  * 3D printable design for a coin holder.                            *
  *                                                                   *
  * This design is initially configured to hold a full set of UK      *
- * coins from 1p to £2. But the set of coins can be readily          *
- * changed to suit your own needs, be it a subset of UK coins, or    *
- * coins of a different currency, completely.                        *
+ * coins from 1p to £2. You can also print versions for US or EU     *
+ * coins, simply by specifying the currency. Or you can change the   *
+ * set of coins to suit your own needs.                              *
  *                                                                   *
  * The design cleverly calculates the correct overall diameter for   *
  * the coin holder, based on the coins that it's configured to hold. *
@@ -25,14 +25,22 @@
  
 $fn=60; // Reasonably high quality
 
+/* Quick note: I've not tested the US or EU currencies, but took the 
+ * dimensions from Wikipedia. If they're wrong, please let me know
+ * so that I can fix any errors in a future version. */
+ 
+currency = "UK"; // "UK", "US" or "EU"
 overall_height = 50; // Height in mm.
 
-// These are the dimensions for UK coins
+// The following tables define the dimensions of UK coins
 
-// You can change the list to suit other currencies, including adding
-// or removing entries (note: if you add or remove, make sure that each 
-// coin, except the last one, has a comma "," after it. If you know OpenSCAD,
-// you'll know this, anyway.
+// UK, US and EU coins are included, buy you can readily modify the
+// list if your using a different currency (maybe let me know what you 
+// used so I can include it in a later version).
+
+// You can change existing entries, adding new ones or remove unneeded ones
+// (note: if you add or remove, make sure that each coin, except the last 
+// one, has a comma "," after it. If you know OpenSCAD, you'll know this, anyway.
 
 // Each coin entry is made up of three values, text, diameter and thickness
 // e.g.
@@ -43,8 +51,7 @@ overall_height = 50; // Height in mm.
 
 // Note: the design doesn't use the thickness, at the moment. Maybe a later version will.
 
-// Dimensions for UK coins
-coins = [
+coins = (currency == "UK") ? [
     ["1",20.3,1.65],
     ["2",25.9,2.03],
     ["5",18,1.89],
@@ -53,10 +60,28 @@ coins = [
     ["50",27.3,1.78],
     ["£1",23.43,2.8],
     ["£2",28.4,2.5]
-    ];
+    ] :
+    (currency == "US") ? [
+    ["1",19.05,1.55],
+    ["5",21.209,1.95],
+    ["10",17.907,1.35],
+    ["25",24.257,1.75],
+    ["50",30.607,2.15],
+    ["$1",26.5,2]
+    ] :
+    (currency == "EU") ? [
+    ["1",16.25,1.67],
+    ["2",18.75,1.67],
+    ["5",21.25,1.67],
+    ["10",19.75,1.93],
+    ["20",22.25,2.14],
+    ["50",24.25,2.38],
+    ["€1",23.25,2.33],
+    ["€2",25.75,2.2]
+    ] : [];
 
 clearance = 0.4; // How much space around each coin
-coin_spacing = 1; // Spacing between coin slots
+coin_spacing = 0.8; // Spacing between coin slots
 trim_radius = 3; // We trim off a little from the outside to allow room for a finger
 base_thickness = 2; // Thickness of the base in mm
 text_size = 10; // Change this is the text, embossed in each tube, is too big or too small
@@ -71,17 +96,22 @@ module main() {
 }
 
 module coin_holder(r) {
-    
-    difference() {
+    intersection() {
+        body(r);
         chamfer_cylinder(r = r-trim_radius, h = overall_height, center=true, chamfer=2);
+    }
+}
+
+module body(r) {
+    
+    e = pillars -1;
+    all_d = [ for(i = [0:1:e]) coins[i][1] ];
+    max_d = max(all_d);
+
+    difference() {
+        cylinder(r = r, h = overall_height, center=true);
+        translate([0,0,base_thickness]) cylinder(r = r-max_d / 2, h = overall_height, center=true);
         translate([0,0,base_thickness]) {
-            e = pillars -1;
-
-            // Cutout a hole in the centre
-            all_d = [ for(i = [0:1:e]) coins[i][1] ];
-            max_d = max(all_d);
-            cylinder(r = r - max_d - 2, h = overall_height, center=true);
-
             for(n = [0:1:e]) {
                 rn = (coins[n][1])/2;
                 m = (n-1) < 0 ? e : (n-1);
@@ -96,12 +126,31 @@ module coin_holder(r) {
                                 }
                             }
                         }
-                        cylinder(r = rn+clearance,h=overall_height,center=true);
+                        cylinder(r = rn+coin_spacing * 2,h=overall_height,center=true);
                     }
                 }
             }
         }
     }
+    
+    translate([0,0,0]) {
+        for(n = [0:1:e]) {
+            rn = (coins[n][1])/2;
+            m = (n-1) < 0 ? e : (n-1);
+            tth = total_theta(r,m);
+            echo("tth = ",tth);
+            rotate([0,0,tth]) {
+                translate([r-rn,0,0]) {
+                    difference() {
+                        cylinder(r = rn+coin_spacing * 2,h=overall_height,center=true);
+                        translate([0,0,0.1]) {
+                            cylinder(r = rn+clearance,h=overall_height+0.2,center=true);
+                        }
+                    }
+                }
+            }
+        }
+    }    
 }
 
 module chamfer_cylinder(r,h,center=false,chamfer=2) {

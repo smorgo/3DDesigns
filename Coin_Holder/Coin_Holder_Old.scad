@@ -72,16 +72,16 @@ module main() {
 
 module coin_holder(r) {
     
-    e = pillars -1;
-    // Cutout a hole in the centre
-    all_d = [ for(i = [0:1:e]) coins[i][1] ];
-    max_d = max(all_d);
-
     difference() {
-            chamfer_cylinder(r = r-trim_radius, h = overall_height, center=true, chamfer=2);
-            translate([0,0,base_thickness]) cylinder(r = r-(max_d /1.5), h = overall_height, center=true);
-    
+        chamfer_cylinder(r = r-trim_radius, h = overall_height, center=true, chamfer=2);
         translate([0,0,base_thickness]) {
+            e = pillars -1;
+
+            // Cutout a hole in the centre
+            all_d = [ for(i = [0:1:e]) coins[i][1] ];
+            max_d = max(all_d);
+            cylinder(r = r - max_d - 2, h = overall_height, center=true);
+
             for(n = [0:1:e]) {
                 rn = (coins[n][1])/2;
                 m = (n-1) < 0 ? e : (n-1);
@@ -96,41 +96,12 @@ module coin_holder(r) {
                                 }
                             }
                         }
-//                        difference() {
-                            cylinder(r = rn+coin_spacing * 2,h=overall_height,center=true);
-//                            cylinder(r = rn+clearance,h=overall_height + 0.02,center=true);
-//                        }
+                        cylinder(r = rn+clearance,h=overall_height,center=true);
                     }
                 }
             }
         }
     }
-
-    
-    translate([0,0,base_thickness]) {
-            for(n = [0:1:e]) {
-                rn = (coins[n][1])/2;
-                m = (n-1) < 0 ? e : (n-1);
-                tth = total_theta(r,m);
-                echo("tth = ",tth);
-                rotate([0,0,tth]) {
-                    translate([r-rn,0,0]) {
-                        translate([0,0,-overall_height/2]) {
-                            rotate([0,0,90]) {
-                                linear_extrude(height = base_thickness, center=true) {
-                                    text(coins[n][0], valign="center", halign="center", size=text_size);
-                                }
-                            }
-                        }
-                        difference() {
-                            cylinder(r = rn+coin_spacing * 2,h=overall_height,center=true);
-                            cylinder(r = rn+clearance,h=overall_height + 0.02,center=true);
-                        }
-                    }
-                }
-            }
-        }
-    
 }
 
 module chamfer_cylinder(r,h,center=false,chamfer=2) {
