@@ -84,7 +84,7 @@ clearance = 0.4; // How much space around each coin
 coin_spacing = 0.8; // Spacing between coin slots
 trim_radius = 3; // We trim off a little from the outside to allow room for a finger
 base_thickness = 2; // Thickness of the base in mm
-text_size = 10; // Change this is the text, embossed in each tube, is too big or too small
+text_size = 10; // Change this if the text, embossed in each tube, is too big or too small
 
 pillars = len(coins);
 
