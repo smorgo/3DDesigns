@@ -11,7 +11,7 @@
  * 3D printable design for a coin holder.                            *
  *                                                                   *
  * This design is initially configured to hold a full set of UK      *
- * coins from 1p to £2. You can also print versions for US or EU     *
+ * coins from 1p to £2. You can also print versions for other        *
  * coins, simply by specifying the currency. Or you can change the   *
  * set of coins to suit your own needs.                              *
  *                                                                   *
@@ -25,16 +25,16 @@
  
 $fn=60; // Reasonably high quality
 
-/* Quick note: I've not tested the US or EU currencies, but took the 
+/* Quick note: I've not tested the US, EU or CA currencies, but took the 
  * dimensions from Wikipedia. If they're wrong, please let me know
  * so that I can fix any errors in a future version. */
  
-currency = "UK"; // "UK", "US" or "EU"
+currency = "UK"; // "UK", "US" or "EU", "CA"
 overall_height = 50; // Height in mm.
 
 // The following tables define the dimensions of UK coins
 
-// UK, US and EU coins are included, buy you can readily modify the
+// UK, US, EU and CA coins are included, buy you can readily modify the
 // list if your using a different currency (maybe let me know what you 
 // used so I can include it in a later version).
 
@@ -78,6 +78,14 @@ coins = (currency == "UK") ? [
     ["50",24.25,2.38],
     ["€1",23.25,2.33],
     ["€2",25.75,2.2]
+    ] :
+    (currency == "CA") ? [
+    ["5",21.2,1.76],
+    ["10",18.03,1.22],
+    ["25",23.88,1.58],
+    ["50",27.13,1.95],
+    ["$1",26.5,1.75],
+    ["$2",28,1.8]
     ] : [];
 
 clearance = 0.4; // How much space around each coin
@@ -110,7 +118,7 @@ module body(r) {
 
     difference() {
         cylinder(r = r, h = overall_height, center=true);
-        translate([0,0,base_thickness]) cylinder(r = r-max_d / 2, h = overall_height, center=true);
+        translate([0,0,base_thickness]) cylinder(r = r-max_d / 1.8, h = overall_height, center=true);
         translate([0,0,base_thickness]) {
             for(n = [0:1:e]) {
                 rn = (coins[n][1])/2;
