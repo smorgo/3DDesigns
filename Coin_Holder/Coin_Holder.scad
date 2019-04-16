@@ -29,7 +29,7 @@ $fn=60; // Reasonably high quality
  * dimensions from Wikipedia. If they're wrong, please let me know
  * so that I can fix any errors in a future version. */
  
-currency = "UK"; // "UK", "US" or "EU", "CA"
+currency = "JP"; // "UK", "US", "EU", "CA", "JP"
 overall_height = 50; // Height in mm.
 
 // The following tables define the dimensions of UK coins
@@ -86,6 +86,14 @@ coins = (currency == "UK") ? [
     ["50",27.13,1.95],
     ["$1",26.5,1.75],
     ["$2",28,1.8]
+    ] :
+    (currency == "JP") ? [
+    ["1",20,1.5],
+    ["5",22,1.5],
+    ["10",23.5,1.5],
+    ["50",21,1.7],
+    ["100",22.6,1.7],
+    ["500",26.5,2]
     ] : [];
 
 clearance = 0.4; // How much space around each coin
