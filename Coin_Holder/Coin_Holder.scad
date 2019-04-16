@@ -29,12 +29,14 @@ $fn=60; // Reasonably high quality
  * dimensions from Wikipedia. If they're wrong, please let me know
  * so that I can fix any errors in a future version. */
  
-currency = "JP"; // "UK", "US", "EU", "CA", "JP"
+currency = "UK"; // "UK", "US", "EU", "CA", "JP"
 overall_height = 50; // Height in mm.
 
-// The following tables define the dimensions of UK coins
+demo = 1; // 0 - just the one, 1 = all of them
 
-// UK, US, EU and CA coins are included, buy you can readily modify the
+// The following table define the dimensions of the coins
+
+// UK, US, EU, CA and JP coins are included, buy you can readily modify the
 // list if your using a different currency (maybe let me know what you 
 // used so I can include it in a later version).
 
@@ -51,7 +53,7 @@ overall_height = 50; // Height in mm.
 
 // Note: the design doesn't use the thickness, at the moment. Maybe a later version will.
 
-coins = (currency == "UK") ? [
+currencies = [[ "UK", [
     ["1",20.3,1.65],
     ["2",25.9,2.03],
     ["5",18,1.89],
@@ -60,16 +62,16 @@ coins = (currency == "UK") ? [
     ["50",27.3,1.78],
     ["£1",23.43,2.8],
     ["£2",28.4,2.5]
-    ] :
-    (currency == "US") ? [
+    ]],
+    [ "US", [
     ["1",19.05,1.55],
     ["5",21.209,1.95],
     ["10",17.907,1.35],
     ["25",24.257,1.75],
     ["50",30.607,2.15],
     ["$1",26.5,2]
-    ] :
-    (currency == "EU") ? [
+    ]],
+    [ "EU", [
     ["1",16.25,1.67],
     ["2",18.75,1.67],
     ["5",21.25,1.67],
@@ -78,23 +80,23 @@ coins = (currency == "UK") ? [
     ["50",24.25,2.38],
     ["€1",23.25,2.33],
     ["€2",25.75,2.2]
-    ] :
-    (currency == "CA") ? [
+    ]],
+    [ "CA", [
     ["5",21.2,1.76],
     ["10",18.03,1.22],
     ["25",23.88,1.58],
     ["50",27.13,1.95],
     ["$1",26.5,1.75],
     ["$2",28,1.8]
-    ] :
-    (currency == "JP") ? [
+    ]],
+    ["JP", [
     ["1",20,1.5],
     ["5",22,1.5],
     ["10",23.5,1.5],
     ["50",21,1.7],
     ["100",22.6,1.7],
     ["500",26.5,2]
-    ] : [];
+    ]]];
 
 clearance = 0.4; // How much space around each coin
 coin_spacing = 0.8; // Spacing between coin slots
@@ -102,24 +104,44 @@ trim_radius = 3; // We trim off a little from the outside to allow room for a fi
 base_thickness = 2; // Thickness of the base in mm
 text_size = 10; // Change this if the text, embossed in each tube, is too big or too small
 
-pillars = len(coins);
-
-module main() {
-    r = find_r(); // Recursively find the correct sized circle to contain all the coins
-    echo("r = ", r);
-    
-    coin_holder(r);
+if( demo ) {
+    demo();
+} else {
+    main(currency);
 }
 
-module coin_holder(r) {
+module demo() { 
+    t = len(currencies);
+    for(i = [0:t-1]) {
+        rotate([0,0,i * 360 / t]) {
+            translate([100,0,0]) {
+                main(currencies[i][0]);
+            }
+        }
+    }
+}
+
+module main(c) {
+    coins = findCoins(c);
+    echo("coins = ", coins);
+
+    r = find_r(coins); // Recursively find the correct sized circle to contain all the coins
+    echo("r = ", r);
+    coin_holder(coins, r);
+}
+
+function findCoins(currency, i = 0) = (currencies[i][0] == currency) ? currencies[i][1] : findCoins(currency, i+1);
+
+module coin_holder(coins, r) {
     intersection() {
-        body(r);
+        body(coins, r);
         chamfer_cylinder(r = r-trim_radius, h = overall_height, center=true, chamfer=2);
     }
 }
 
-module body(r) {
+module body(coins, r) {
     
+    pillars = len(coins);
     e = pillars -1;
     all_d = [ for(i = [0:1:e]) coins[i][1] ];
     max_d = max(all_d);
@@ -131,7 +153,7 @@ module body(r) {
             for(n = [0:1:e]) {
                 rn = (coins[n][1])/2;
                 m = (n-1) < 0 ? e : (n-1);
-                tth = total_theta(r,m);
+                tth = total_theta(coins,r,m);
                 echo("tth = ",tth);
                 rotate([0,0,tth]) {
                     translate([r-rn,0,0]) {
@@ -153,7 +175,7 @@ module body(r) {
         for(n = [0:1:e]) {
             rn = (coins[n][1])/2;
             m = (n-1) < 0 ? e : (n-1);
-            tth = total_theta(r,m);
+            tth = total_theta(coins,r,m);
             echo("tth = ",tth);
             rotate([0,0,tth]) {
                 translate([r-rn,0,0]) {
@@ -178,19 +200,18 @@ module chamfer_cylinder(r,h,center=false,chamfer=2) {
     }
 }
 
-function find_r(r = 10,rl = 0,rh = 200) = 
-    let(t = total_theta(r,pillars-1))
-    (t != t || (t > 360.001)) ? find_r((r+rh)/2,r,rh) : ((t < 359.999) ? find_r((r+rl)/2,rl,r) : r);
+function find_r(coins,r = 10,rl = 0,rh = 200) = 
+    let(t = total_theta(coins,r,len(coins)-1))
+    (t != t || (t > 360.001)) ? find_r(coins,(r+rh)/2,r,rh) : ((t < 359.999) ? find_r(coins,(r+rl)/2,rl,r) : r);
     
 function sum(v, i = 0, r = 0) = i < len(v) ? sum(v, i + 1, r + v[i]) : r;
 
-function total_theta(r,n) = 
-    sum( [ for(i=[0:n]) coin_theta(r,i, (i+1) == pillars ? 0 : (i+1)) ]);
+function total_theta(coins,r,n) = 
+    sum( [ for(i=[0:n]) coin_theta(coins,r,i, (i+1) == len(coins) ? 0 : (i+1)) ]);
         
-function coin_theta(r,n,m) =
+function coin_theta(coins, r,n,m) =
     theta(r, (coins[n][1])/2 + coin_spacing, (coins[m][1])/2 + coin_spacing);
 
 function theta(r,rn,rm) =
     acos(((r-rn)*(r-rn)+(r-rm)*(r-rm)-(rn+rm)*(rn+rm))/(2 * (r-rn) * (r-rm)));
 
-main();
