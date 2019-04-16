@@ -32,7 +32,7 @@ $fn=60; // Reasonably high quality
 currency = "UK"; // "UK", "US", "EU", "CA", "JP"
 overall_height = 50; // Height in mm.
 
-demo = 1; // 0 - just the one, 1 = all of them
+demo = 0; // 0 - just the one, 1 = all of them
 
 // The following table define the dimensions of the coins
 
