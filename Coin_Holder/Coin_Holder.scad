@@ -29,7 +29,10 @@ $fn=60; // Reasonably high quality
  * dimensions from Wikipedia. If they're wrong, please let me know
  * so that I can fix any errors in a future version. */
  
-currency = "UK"; // "UK", "US", "EU", "CA", "JP"
+ /* The Joey variant is to accommodate a request from a Thingiverse
+  * member who wanted a Canadian version to suit a game. */
+  
+currency = "Joey"; // "UK", "US", "EU", "CA", "JP", "Joey"
 overall_height = 50; // Height in mm.
 
 demo = 0; // 0 - just the one, 1 = all of them
@@ -88,6 +91,13 @@ currencies = [[ "UK", [
     ["50",27.13,1.95],
     ["$1",26.5,1.75],
     ["$2",28,1.8]
+    ]],
+    [ "Joey", [
+    ["10",18.03,1.22],
+    ["25",23.88,1.58],
+    ["$2",28,1.8],
+    ["10",18.03,1.22],
+    ["25",23.88,1.58]
     ]],
     ["JP", [
     ["1",20,1.5],
