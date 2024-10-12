@@ -5,6 +5,9 @@ A place to create 3D models, primarily for incorporation into printed models
 An OpenSCAD library to creating bayonet locking connector parts. This is primarily a refactoring exercise, exploiting the good work of 
 [Alexandre Da Silva Xavier](https://www.thingiverse.com/thing:3471896) over on Thingiverse. Alexandre's work is licensed under Creative Commons - Attribution.
 
+## Brother E550W Holder for IKEA Skadis
+A Fusion360 model for the Brother E550W label printer, allowing it to be mounted on an IKEA Skadis pegboard. Requires the Universal Skadis Hooks that you can find on Thingiverse.
+
 ## Coin Holder
 An OpenSCAD script to create a round coin holder. It has built-in support for a number of different currencies, but you 
 can change it to suit your needs.
